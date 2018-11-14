@@ -19,11 +19,20 @@ namespace TestMVCWebApp.Controllers
         }
 
         // GET: Notes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Note.ToListAsync());
-        }
+            // создается запрос в  LINQ
+            var notes = from m in _context.Note
+                         select m;
 
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                // поиск по заголовку(HeadLine)
+                notes = notes.Where(s => s.HeadLine.Contains(searchString));
+            }
+
+            return View(await notes.ToListAsync());
+        }
         // GET: Notes/Details/5
         public async Task<IActionResult> Details(int? id)
         {

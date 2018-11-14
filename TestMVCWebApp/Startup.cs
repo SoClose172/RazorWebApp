@@ -36,6 +36,7 @@ namespace TestMVCWebApp
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            // Подключение к базе данных
             services.AddDbContext<TestMVCWebAppContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("TestMVCWebAppContext")));
         }
