@@ -15,6 +15,7 @@ namespace RazorWebApp.Data
             
         }
 
-        public DbSet<RazorWebApp.Models.Note> Note { get; set; }
+        public DbSet<Note> Note { get; set; }
+        public DbSet<Owner> Owners { get; set; }
     }
 }
