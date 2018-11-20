@@ -49,6 +49,8 @@
                 @Html.DisplayFor(modelItem => item.Number)
             </td>
             <td>
+                
+                <img src="https://avatars.dicebear.com/v2/male/@(item.ID).svg" width="20" height="20" />
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>

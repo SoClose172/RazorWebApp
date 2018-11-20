@@ -36,15 +36,18 @@ namespace RazorWebApp
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                    options.UseSqlServer(
+                            Configuration.GetConnectionString("DefaultConnection"))
+                        .UseLazyLoadingProxies() //Mifort: Lazy load 
+            );
+
+            services.AddDefaultIdentity<User>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();//Mifort: Изменил под кастомного юзера
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("RazorWebAppContext")));
+            //services.AddDbContext<ApplicationDbContext>(options =>//Mifort: Зачем использовать 2 базы данных привязанных к 1 контексту?
+            //        options.UseSqlServer(Configuration.GetConnectionString("RazorWebAppContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

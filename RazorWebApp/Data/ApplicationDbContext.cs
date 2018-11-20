@@ -7,7 +7,7 @@ using RazorWebApp.Models;
 
 namespace RazorWebApp.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<User>// Привязываем к кастомному пользователю
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -16,6 +16,5 @@ namespace RazorWebApp.Data
         }
 
         public DbSet<Note> Note { get; set; }
-        public DbSet<Owner> Owners { get; set; }
     }
 }

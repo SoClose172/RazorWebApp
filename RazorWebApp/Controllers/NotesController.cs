@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RazorWebApp.Models;
 using RazorWebApp.Data;
-using Microsoft.AspNetCore.Authorization; //для функций авторизации
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+
+
 
 
 namespace RazorWebApp.Controllers
@@ -16,27 +19,33 @@ namespace RazorWebApp.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public NotesController(ApplicationDbContext context)
+        private UserManager<User>
+            _userManager; // Добавил менеджер пользователей для поиска текущего пользователя
+
+        public NotesController(ApplicationDbContext context, UserManager<User> userManager) // Тжс
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Notes
         [Authorize]
         public async Task<IActionResult> Index(string searchString)
         {
-            var notes = from m in _context.Note
-                        select m;
-            if(!string.IsNullOrEmpty(searchString))
+            var user = await _userManager.GetUserAsync(User); // Ищем пользователя
+            var notes = user.Notes; // Lazy load user notes
+            // var notes = from m in _context.Note
+            //             select m;
+            if (!string.IsNullOrEmpty(searchString))
             {
-                notes = notes.Where(s => s.HeadLine.Contains(searchString));
+                notes = notes.Where(s => s.HeadLine.Contains(searchString)).ToList();
             }
-            return View(await notes.ToListAsync());
+
+            return View(notes); // убрал приведение к листу, оно теперь раньше
         }
 
         // GET: Notes/Details/5
         [Authorize]
-
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -56,7 +65,6 @@ namespace RazorWebApp.Controllers
 
         // GET: Notes/Create
         [Authorize]
-
         public IActionResult Create()
         {
             return View();
@@ -71,10 +79,13 @@ namespace RazorWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = await _userManager.GetUserAsync(User); //Mifort: Ищем пользователя
+                note.User = user;// Присваиваем заметке юзера
                 _context.Add(note);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(note);
         }
 
@@ -91,6 +102,7 @@ namespace RazorWebApp.Controllers
             {
                 return NotFound();
             }
+
             return View(note);
         }
 
@@ -125,14 +137,15 @@ namespace RazorWebApp.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(note);
         }
 
         // GET: Notes/Delete/5
         [Authorize]
-
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,7 +165,6 @@ namespace RazorWebApp.Controllers
 
         // POST: Notes/Delete/5
         [Authorize]
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
